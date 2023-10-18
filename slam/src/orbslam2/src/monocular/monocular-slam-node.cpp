@@ -17,11 +17,12 @@ MonocularSlamNode::MonocularSlamNode(ORB_SLAM2::System* pSLAM, const string &str
     m_SLAM(pSLAM)
 {
 
+    // m_image_subscriber = this->create_subscription<ImageMsg>("camera", std::bind(&MonocularSlamNode::GrabImage, this, std::placeholders::_1));
     m_image_subscriber = this->create_subscription<ImageMsg>("camera", 10, std::bind(&MonocularSlamNode::GrabImage, this, std::placeholders::_1));
 
-    m_annotated_image_publisher = this->create_publisher<ImageMsg>("annotated_frame",10);
+    m_annotated_image_publisher = this->create_publisher<ImageMsg>("annotated_frame", 10);
 
-    m_map_publisher = this->create_publisher<MarkerMsg>("ORB_SLAM_map",10);
+    m_map_publisher = this->create_publisher<MarkerMsg>("ORB_SLAM_map", 10);
 
     mState = ORB_SLAM2::Tracking::SYSTEM_NOT_READY;
     
@@ -163,10 +164,10 @@ void MonocularSlamNode::InitializeMarkersPublisher( const string &strSettingPath
 
 
     m_map_publisher->publish(mPoints);
-    m_map_publisher->publish(mReferencePoints);
-    //m_map_publisher->publish(mCovisibilityGraph);
+    // m_map_publisher->publish(mReferencePoints);
+    m_map_publisher->publish(mCovisibilityGraph);
     m_map_publisher->publish(mKeyFrames);
-    //m_map_publisher->publish(mCurrentCamera);
+    m_map_publisher->publish(mCurrentCamera);
 
 
 }
@@ -249,7 +250,7 @@ void MonocularSlamNode::PublishFrame()
     rosImage.header.stamp = this->now();
     rosImage.encoding = "bgr8";
 
-    m_annotated_image_publisher->publish(rosImage.toImageMsg());
+    m_annotated_image_publisher->publish(*rosImage.toImageMsg());
     
 }
 
@@ -424,7 +425,7 @@ void MonocularSlamNode::PublishMapPoints()
 
         mPoints.points.push_back(p);
     }
-
+    cout << "Points amount "<< mvMapPoints.size()<< endl;
     for(set<ORB_SLAM2::MapPoint*>::iterator sit=spRefMPs.begin(), send=spRefMPs.end(); sit!=send; sit++)
     {
         if((*sit)->isBad())
@@ -443,7 +444,7 @@ void MonocularSlamNode::PublishMapPoints()
     mPoints.header.stamp = this->now();
     mReferencePoints.header.stamp = this->now();
     m_map_publisher->publish(mPoints);
-    m_map_publisher->publish(mReferencePoints);
+    // m_map_publisher->publish(mReferencePoints);
 
 }
 
