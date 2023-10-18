@@ -15,7 +15,8 @@ def generate_launch_description():
                 {'connect_timeout': 10.0},
                 {'tello_ip': '192.168.10.1'},
                 {'tf_base': 'map'},
-                {'tf_drone': 'drone'}
+                {'tf_drone': 'drone'},
+                {'tf_pub': 'True'}
             ],
             remappings=[
                 ('/image_raw', '/camera')
