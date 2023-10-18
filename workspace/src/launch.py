@@ -44,15 +44,15 @@ def generate_launch_description():
         ),
 
         # RViz data visualization tool
-        Node(
-            package='rviz2',
-            executable='rviz2',
-            output='screen',
-            namespace='/',
-            name='rviz2',
-            respawn=True,
-            arguments=['-d', '/home/tentone/Git/tello-slam/workspace/src/rviz.rviz']
-        ),
+        #Node(
+        #    package='rviz2',
+        #    executable='rviz2',
+        #    output='screen',
+        #    namespace='/',
+        #    name='rviz2',
+        #    respawn=True,
+        #    arguments=['-d', '/home/tentone/Git/tello-slam/workspace/src/rviz.rviz']
+        #),
 
         # Static TF publisher
         Node(
