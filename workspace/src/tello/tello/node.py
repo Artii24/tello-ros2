@@ -33,7 +33,7 @@ class TelloNode():
 
         # Declare parameters
         self.node.declare_parameter('connect_timeout', 10.0)
-        self.node.declare_parameter('tello_ip', '192.168.10.1')
+        self.node.declare_parameter('tello_ip', '192.168.0.132')
         self.node.declare_parameter('tf_base', 'map')
         self.node.declare_parameter('tf_drone', 'drone')
         self.node.declare_parameter('tf_pub', False)
@@ -71,7 +71,11 @@ class TelloNode():
         self.tello.connect()
 
         self.node.get_logger().info('Tello: Connected to drone')
-
+        self.bar_init = 0
+        n =10
+        for i in range(n):
+            self.bar_init = self.bar_init+ self.tello.get_barometer()
+        self.bar_init = self.bar_init/n
         # Publishers and subscribers
         self.setup_publishers()
         self.setup_subscribers()
@@ -128,7 +132,20 @@ class TelloNode():
                     t.child_frame_id = self.tf_drone
                     t.transform.translation.x = 0.0
                     t.transform.translation.y = 0.0
-                    t.transform.translation.z = (self.tello.get_barometer()) / 100.0
+                    t.transform.translation.z = (self.tello.get_barometer()-self.bar_init) / 100.0 
+                    self.tf_broadcaster.sendTransform(t)
+
+                    # t.header.stamp = self.node.get_clock().now().to_msg()
+                    t.header.frame_id = self.tf_drone
+                    t.child_frame_id = "camera_frame"
+                    t.transform.translation.x = 0.0
+                    t.transform.translation.y = 0.0
+                    t.transform.translation.z = 0.0
+                    q_cam = euler_to_quaternion([0.0,0.6041,0.0])
+                    t.transform.rotation.x = q_cam[0]
+                    t.transform.rotation.y = q_cam[1]
+                    t.transform.rotation.z = q_cam[2]
+                    t.transform.rotation.w = q_cam[3]
                     self.tf_broadcaster.sendTransform(t)
                 
                 # IMU
@@ -314,7 +331,8 @@ class TelloNode():
     # 
     # Directions can be "r" for right, "l" for left, "f" for forward or "b" for backward.
     def cb_flip(self, msg):
-        self.tello.flip(msg.data)
+        # self.tello.flip(msg.data)
+        self.tello.sh
 
 # Convert a rotation from euler to quaternion.
 def euler_to_quaternion(r):
